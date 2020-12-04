@@ -1,4 +1,5 @@
 import configparser
+import smtplib
 import random
 
 class Game():
@@ -19,12 +20,7 @@ class Game():
 
         recievers = self.santas.copy()
 
-        matches = Match.create_matches(self.santas, recievers)
-
-        if self.bad_match_check(matches):
-            return self.start()
-
-        return matches
+        return Match.create_matches(self.santas, recievers)
 
     def build_santas(self, all_bad_matches, name, email):
         bad_matches = []
@@ -38,25 +34,8 @@ class Game():
         s = Santa(name, email, bad_matches)
         self.santas.append(s)
 
-    # this has about a 50% chance of being ran, but fixes the problem
-    def bad_match_check(self, matches):
-        bad = False
-
-        for match in matches:
-            if match.santa.name == match.santee.name:
-                bad = True
-
-            if match.santa.name in match.santee.bad_matches:
-                bad = True
-
-            if match.santee.name in match.santa.bad_matches:
-                bad = True
-
-        return bad
-
     def clear(self):
         self.santas = []
-
 
 
 class Santa():
@@ -91,7 +70,7 @@ class Match():
     def select_santee(santa, santees):
         rand = random.choice(santees)
 
-        if santa.name == rand.name or santa.name in santa.bad_matches:
+        if santa.name == rand.name or santa.name in rand.bad_matches:
             if len(santees) < 2:
                 raise Exception("need a redo")
             else:
@@ -110,14 +89,25 @@ class SMTP():
         self.username = info[2]
         self.password = info[3]
 
-    #@staticmethod
+        print("Logging in to SMTP Server")
+
+        self.connect()
+        self.login()
+
+    def connect(self):
+        self.connection = smtplib.SMTP_SSL(self.server, self.port)
+        self.connection.ehlo()
+
+    def login(self):
+        self.connection.login(self.username, self.password)
+
     def sendmail(self, match):
         print("sending email to " + match.santa.name + " about " + match.santee.name)
 
 
 class Parser():
     def __init__(self, filename):
-        self.config = configparser.ConfigParser()
+        self.config = configparser.RawConfigParser()
         self.config.read(filename)
 
         game = self.config['GAME']
@@ -162,6 +152,8 @@ def main():
 
     matches = game.start()
 
+    #efficiency_test(game, 1000)
+
     for match in matches:
         smtp.sendmail(match)
 
@@ -169,8 +161,7 @@ def main():
 def efficiency_test(game, trials):
     bad_count = 0
     for i in range(trials):
-
-        matches = game.start(santas, all_bad_matches)
+        matches = game.start()
         bad = False
 
         for match in matches:
