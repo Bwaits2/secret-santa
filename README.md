@@ -1,1 +1,1 @@
-# secret-santa
+# secret santa python script
