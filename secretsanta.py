@@ -12,6 +12,8 @@ class Game():
     def start(self):
         self.clear()
 
+        print("Computing valid matches")
+
         for player in self.players:
             player = player.split()
             name, email = player[0], player[1]
@@ -89,10 +91,12 @@ class SMTP():
         self.username = info[2]
         self.password = info[3]
 
-        print("Logging in to SMTP Server")
+        print("Logging in to SMTP")
 
-        self.connect()
-        self.login()
+        #self.connect()
+        #self.login()
+
+        print("Connected to SMTP")
 
     def connect(self):
         self.connection = smtplib.SMTP_SSL(self.server, self.port)
@@ -101,8 +105,16 @@ class SMTP():
     def login(self):
         self.connection.login(self.username, self.password)
 
-    def sendmail(self, match):
-        print("sending email to " + match.santa.name + " about " + match.santee.name)
+    def sendmail(self, match, email):
+        s = self.username
+        r = match.santa.email
+        m = email.format(santa = match.santa.name,
+                         email = r,
+                         santee = match.santee.name)
+
+        print("Sending email to " + match.santa.name)
+
+        #self.connection.sendmail(s, r, m)
 
 
 class Parser():
@@ -119,6 +131,9 @@ class Parser():
                             smtp['PORT'],
                             smtp['USERNAME'],
                             smtp['PASSWORD']]
+
+        email = self.config['EMAIL']
+        self.email = 'Subject: ' + email['SUBJECT'] + '\nTo: '  + '{email}\n' + email['BODY']
 
     @property
     def players(self):
@@ -144,6 +159,14 @@ class Parser():
     def smtp_info(self, value):
         self._smtp_info = value
 
+    @property
+    def email(self):
+        return self._email
+
+    @email.setter
+    def email(self, value):
+        self._email = value
+
 
 def main():
     parser = Parser('config.ini')
@@ -152,30 +175,8 @@ def main():
 
     matches = game.start()
 
-    #efficiency_test(game, 1000)
-
     for match in matches:
-        smtp.sendmail(match)
-
-
-def efficiency_test(game, trials):
-    bad_count = 0
-    for i in range(trials):
-        matches = game.start()
-        bad = False
-
-        for match in matches:
-            if match.santa.name == match.santee.name:
-                bad = True
-            if match.santa.name in match.santee.bad_matches:
-                bad = True
-            if match.santee.name in match.santa.bad_matches:
-                bad = True
-
-        if bad:
-            bad_count += 1
-
-    print("failure rate: " + str(bad_count / trials))
+        smtp.sendmail(match, parser.email)
 
 
 if __name__ == "__main__":
