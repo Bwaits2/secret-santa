@@ -20,7 +20,7 @@ It randomly pairs up all participants, then sends each participant an email tell
 3. Customize the email that will be sent to all players
 4. Run the script
   ```sh
-  python secretsanta.py
+  python secret-santa.py
   ```
 
 
@@ -31,6 +31,7 @@ Here is a list of features I am working on trying to add:
 2. Command line help flag
 3. Ability to force a match
 4. Think of a smarter way to code the Parser class
+5. Unit testing script
 
 Crazy and/or weird ideas:
 1. Running the script bring up an interactable prompt with numbered options
