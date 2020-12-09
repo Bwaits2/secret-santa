@@ -5,6 +5,13 @@ This is a simple secret santa script built with Python 3.
 It randomly pairs up all participants, then sends each participant an email telling them who they got paired with.
 
 
+## Requirements
+
+All modules used are included in the python standard library.
+
+Python >= 3.2 is required.
+
+
 ## Installation
 
 1. Clone the repo
@@ -18,20 +25,23 @@ It randomly pairs up all participants, then sends each participant an email tell
 1. Add your email username and password to the config file for smtp
 2. Add all player names and emails, as well as bad pairs
 3. Customize the email that will be sent to all players
-4. Run the script
+4. To test matching, run the script like so
   ```sh
   python secret-santa.py
   ```
+5. To run the script and send emails to all participants with their match
+```sh
+python secret-santa.py -s
+```
 
 
 ## Roadmap
 
 Here is a list of features I am working on trying to add:
-1. Command line flag to send or test
-2. Command line help flag
-3. Ability to force a match
-4. Think of a smarter way to code the Parser class
-5. Unit testing script
+1. Ability to force a match
+2. Integration testing script
+3. SMTP timeout handler
+4. More fool-proofing
 
 Crazy and/or weird ideas:
 1. Running the script bring up an interactable prompt with numbered options

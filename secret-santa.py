@@ -1,6 +1,7 @@
 import configparser
 import smtplib
 import random
+import argparse
 
 class Game():
     def __init__(self, santas, all_bad_matches):
@@ -80,8 +81,13 @@ class Match():
 
         return rand
 
+    @staticmethod
+    def printAll(matches):
+        for match in matches:
+            print(match)
+
     def __str__(self):
-        return "Match: " + self.santa + " -> " + self.santee
+        return "  " + self.santa.name + " -> " + self.santee.name
 
 
 class SMTP():
@@ -93,8 +99,8 @@ class SMTP():
 
         print("Logging in to SMTP")
 
-        #self.connect()
-        #self.login()
+        self.connect()
+        self.login()
 
         print("Connected to SMTP")
 
@@ -112,9 +118,10 @@ class SMTP():
                          email = r,
                          santee = match.santee.name)
 
-        print("Sending email to " + match.santa.name)
+        print("Sending email to "
+                + match.santa.name + " at " + match.santa.email)
 
-        #self.connection.sendmail(s, r, m)
+        self.connection.sendmail(s, r, m)
 
 
 class Parser():
@@ -133,50 +140,40 @@ class Parser():
                             smtp['PASSWORD']]
 
         email = self.config['EMAIL']
-        self.email = 'Subject: ' + email['SUBJECT'] + '\nTo: '  + '{email}\n' + email['BODY']
+        self.email = ('Subject: '+ email['SUBJECT']
+                        + '\nTo: '  + '{email}\n' + email['BODY'])
 
-    @property
-    def players(self):
-        return self._players
 
-    @players.setter
-    def players(self, value):
-        self._players = value
+class ArgParser():
+    def __init__(self):
+        self.parser = argparse.ArgumentParser()
+        self.add_arguments()
+        self.args = self.parser.parse_args()
 
-    @property
-    def all_bad_matches(self):
-        return self._all_bad_matches
-
-    @all_bad_matches.setter
-    def all_bad_matches(self, value):
-        self._all_bad_matches = value
-
-    @property
-    def smtp_info(self):
-        return self._smtp_info
-
-    @smtp_info.setter
-    def smtp_info(self, value):
-        self._smtp_info = value
-
-    @property
-    def email(self):
-        return self._email
-
-    @email.setter
-    def email(self, value):
-        self._email = value
+    def add_arguments(self):
+        self.parser.add_argument('-s',
+                                '--send',
+                                action='store_true',
+                                help='login to smtp and send all emails')
 
 
 def main():
-    parser = Parser('config.ini')
-    game = Game(parser.players, parser.all_bad_matches)
-    smtp = SMTP(parser.smtp_info)
+    send = ArgParser().args.send
+
+    iniParser = Parser('config.ini')
+    game = Game(iniParser.players, iniParser.all_bad_matches)
 
     matches = game.start()
 
-    for match in matches:
-        smtp.sendmail(match, parser.email)
+    if send:
+        smtp = SMTP(iniParser.smtp_info)
+
+        for match in matches:
+            smtp.sendmail(match, iniParser.email)
+    else:
+        print("\nHere is an example of the matches computed:")
+        Match.printAll(matches)
+        print("Use the '-s' flag to run again and send all emails")
 
 
 if __name__ == "__main__":
