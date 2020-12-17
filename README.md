@@ -39,6 +39,7 @@ Python >= 3.2 is required.
 Here is a list of features I am working on trying to add:
 1. Ability to force a match
 2. Integration testing script
+3. Determine the logistics of ensuring all matches are in big circle
 4. An efficient way to determine if correct matches will be possible to compute
 
 Crazy and/or weird ideas:
