@@ -2,6 +2,7 @@ import configparser
 import smtplib
 import random
 import argparse
+import sys
 
 class Game():
     def __init__(self, santas, all_bad_matches):
@@ -9,6 +10,12 @@ class Game():
         self.santas = []
         self.players = santas
         self.all_bad_matches = all_bad_matches
+
+        self.input_check()
+
+    def input_check(self):
+        if len(self.players) < 2:
+            sys.exit("There are less than 2 players - add more players")
 
     def start(self):
         self.clear()
@@ -23,7 +30,7 @@ class Game():
 
         recievers = self.santas.copy()
 
-        return Match.create_matches(self.santas, recievers)
+        return Match.create_matches(self.santas, recievers, 0)
 
     def build_santas(self, all_bad_matches, name, email):
         bad_matches = []
@@ -54,7 +61,7 @@ class Match():
         self.santee = santee
 
     @staticmethod
-    def create_matches(santas, santees):
+    def create_matches(santas, santees, count):
         aas = santas.copy()
         ees = santees.copy()
 
@@ -65,7 +72,10 @@ class Match():
                 ees.remove(ee)
                 matches.append(Match(a, ee))
         except:
-            return Match.create_matches(santas, santees)
+            if count >= 750:
+                sys.exit("Cannot compute - remove some bad matches")
+
+            return Match.create_matches(santas, santees, count + 1)
 
         return matches
 
@@ -75,7 +85,7 @@ class Match():
 
         if santa.name == rand.name or santa.name in rand.bad_matches:
             if len(santees) < 2:
-                raise Exception("need a redo")
+                raise Exception("needs a redo")
             else:
                 return Match.select_santee(santa, santees)
 
@@ -105,11 +115,17 @@ class SMTP():
         print("Connected to SMTP")
 
     def connect(self):
-        self.connection = smtplib.SMTP_SSL(self.server, self.port)
-        self.connection.ehlo()
+        try:
+            self.connection = smtplib.SMTP_SSL(self.server, self.port)
+            self.connection.ehlo()
+        except:
+            sys.exit("Couldn't connect to SMTP - check your connection")
 
     def login(self):
-        self.connection.login(self.username, self.password)
+        try:
+            self.connection.login(self.username, self.password)
+        except:
+            sys.exit("Couldn't log in to your email - check your credentials")
 
     def sendmail(self, match, email):
         s = self.username

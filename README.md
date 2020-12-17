@@ -6,7 +6,6 @@ It randomly pairs up all participants, then sends each participant an email tell
 
 
 ## Requirements
-
 All modules used are included in the python standard library.
 
 Python >= 3.2 is required.
@@ -26,13 +25,13 @@ Python >= 3.2 is required.
 2. Add all player names and emails, as well as bad pairs
 3. Customize the email that will be sent to all players
 4. To test matching, run the script like so
-  ```sh
-  python secret-santa.py
-  ```
+   ```sh
+   python secret-santa.py
+   ```
 5. To run the script and send emails to all participants with their match
-```sh
-python secret-santa.py -s
-```
+   ```sh
+   python secret-santa.py -s
+   ```
 
 
 ## Roadmap
@@ -40,8 +39,7 @@ python secret-santa.py -s
 Here is a list of features I am working on trying to add:
 1. Ability to force a match
 2. Integration testing script
-3. SMTP timeout handler
-4. More fool-proofing
+4. An efficient way to determine if correct matches will be possible to compute
 
 Crazy and/or weird ideas:
 1. Running the script bring up an interactable prompt with numbered options
