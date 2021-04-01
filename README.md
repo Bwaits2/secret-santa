@@ -15,7 +15,7 @@ Python >= 3.2 is required.
 
 1. Clone the repo
    ```sh
-   git clone git@github.com:Bwaits2/secret-santa.git
+   git clone git@github.com:brendenwaits/secret-santa.git
    ```
 
 
